@@ -1,16 +1,17 @@
 import mysql.connector
+#CREATE USER 'nuevo_usuario' IDENTIFIED BY 'clave123';
 class DatabaseConnection:
    _connection = None
 @classmethod
 def get_connection(cls):
  if cls._connection is None:
     cls._connection = mysql.connector.connect(
- host='127.0.0.1',
- user='my_user',
- port = "3306",
- password='my_pass',
- database='my_database'cd
- )
+       host='127.0.0.1',
+        user='nuevo_usuario',
+        port = "3306",
+        password='clave123',
+        database='sales',
+    )
  return cls._connection
 @classmethod
 def execute_query(cls, query, params=None):
