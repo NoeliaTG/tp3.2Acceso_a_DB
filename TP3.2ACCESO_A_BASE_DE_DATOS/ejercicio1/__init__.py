@@ -26,7 +26,7 @@ def init_app():
         return {"msg": "No se encontró el cliente"}, 404
         
     #Ejercio 1.2: Obtener el listado de clientes.
-    @app.route('/customers', methods = ['GET'])
+    @app.route('/customers/', methods = ['GET'])
     def get_clientes():
         query= "SELECT customer_id, first_name, last_name, email, phone, street, city, state, zip_code FROM sales.customers;"
         results = DatabaseConnection.fetch_all(query)
@@ -42,23 +42,32 @@ def init_app():
             "estado": result[6],
             "codigo postal": result[7],
             })
+        query2=
         return clientes, 200
 
     #Ejercicio 1.3: Registrar un cliente.
     @app.route('/customers', methods = ['POST'])
-    def create_actor():
-        query= "INSERT INTO sales.customers (first_name, last_name, email, phone, street, city, state, zip_code) VALUES (%s,%s,%s,%s,%s,%s,%s);"
-        params = request.args.get('first_name', ''), request.args.get('last_name', ''), request.args.get('email', ''), request.args.get('phone', ''), request.args.get('street', ''), request.args.get('city', ''),request.args.get('state', ''),request.args.get('zip_code', '')
+    def create_customer():
+        query= "INSERT INTO sales.customers (first_name, last_name, email, phone) VALUES (%s,%s,%s,%s);"
+        params = request.args.get('first_name', ''), request.args.get('last_name', ''), request.args.get('email', ''), request.args.get('phone', '')
         DatabaseConnection.execute_query(query, params)
         return {"msg": "Actor creado con éxito"}, 201
 
-    #Ejercicio 1.4: Modificar un clieinte.
+    #Ejercicio 1.4: Modificar un cliente.
     @app.route('/customers/<int:customer_id>', methods = ["PUT"])
-    def modificar_cliente():
-        return""
+    def update_customer(customer_id):
+        query = "UPDATE sales.customers SET phone = %s WHERE customer_id=%s;"
+        params = request.args.get('phone', ''), customer_id
+        DatabaseConnection.execute_query(query, params)
+        return {"msg": "Datos del cliente actualizados con exito"}, 200
+
     #Ejercicio 1.5: Eliminar un cliente.
     @app.route('/customers/<int:customer_id>', methods = ["DELETE"])
-    def delete_customer():
-        return""
+    def delete_customer(customer_id):
+        query= "DELETE FROM sales.customer WHERE actor.actor_id = %s;"
+        params = customer_id,
+        DatabaseConnection.execute_query(query, params)
+
+        return {"msg": "Actor eliminado con éxito"}, 204
     
     return app
