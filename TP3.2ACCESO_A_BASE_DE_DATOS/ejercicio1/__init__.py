@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 from config import Config
 from .database import DatabaseConnection
 
@@ -28,7 +28,7 @@ def init_app():
     #Ejercio 1.2: Obtener el listado de clientes.
     @app.route('/customers', methods = ['GET'])
     def get_clientes():
-        query= "SELECT customer_id, first_name, last_name, email, phone, street, city, state, zip_code FROM sales.customers WHERE customer_id = %s;"
+        query= "SELECT customer_id, first_name, last_name, email, phone, street, city, state, zip_code FROM sales.customers;"
         results = DatabaseConnection.fetch_all(query)
         clientes = []
         for result in results:
@@ -46,8 +46,12 @@ def init_app():
 
     #Ejercicio 1.3: Registrar un cliente.
     @app.route('/customers', methods = ['POST'])
-    def aniadir_a_lista():
-        return""
+    def create_actor():
+        query= "INSERT INTO sales.customers (first_name, last_name, email, phone, street, city, state, zip_code) VALUES (%s,%s,%s,%s,%s,%s,%s);"
+        params = request.args.get('first_name', ''), request.args.get('last_name', ''), request.args.get('email', ''), request.args.get('phone', ''), request.args.get('street', ''), request.args.get('city', ''),request.args.get('state', ''),request.args.get('zip_code', '')
+        DatabaseConnection.execute_query(query, params)
+        return {"msg": "Actor creado con éxito"}, 201
+
     #Ejercicio 1.4: Modificar un clieinte.
     @app.route('/customers/<int:customer_id>', methods = ["PUT"])
     def modificar_cliente():
