@@ -9,15 +9,11 @@ def init_app():
 	app.config.from_object(Config) 
 			
 	@app.route('/')
-	def hola():
-		return 'hola'
-	
-	@app.route('/home')
 	def home():
-		return  ({'message':'Bienvenido a Academia!'}, 200, {'Content-Type':'application/json'})
+		return  "trabajo practico 3.2 Programacion II"
 
-	#EJERCICIO 2
-	#1.1 obtener un cliente
+	#EJERCICIO 1
+	#1.1 Obtener un cliente
 	@app.route('/customers/<int:customer_id>', methods = ['GET'])
 	def get_customer(customer_id):
 		query= "SELECT customer_id, first_name, last_name, email, phone, street, city, state, zip_code  FROM customers WHERE customer_id = %s;"
@@ -39,7 +35,7 @@ def init_app():
 		return {"msg": "No se encontró el cliente"}, 404
 
 
-	#1.2 obtener el listado de clientes con filtro
+	#1.2 Obtener el listado de clientes con filtro
 		#campo=atributo 			(puede ser cualquier atributo de la tabla customers)
 	    #valor=nombre o numero 		(valor del que buscamos saber cuantas veces se repite) 
 	    #EJEMPLO:(city=Anaheim)--> http://127.0.0.1:5000/customers?campo=city&valor=Anaheim
@@ -73,9 +69,8 @@ def init_app():
 				},200
 		
 	
-	
-	#1.3 registar un cliente
-	#EJEMPLO http://127.0.0.1:5000/customers/registrar?first_name="Fulanitos"&last_name="Rodriguez"&email="fulano@hola.ar"
+	#1.3 Registar un cliente
+	#EJEMPLO http://127.0.0.1:5000/customers/registrar?first_name=Fulanitos&last_name=Rodriguez&email=fulano@gmail.com
 	@app.route('/customers/registrar', methods = ['GET','POST'])
 	def create_customer():	
 		query= "INSERT INTO sales.customers (first_name, last_name, email) VALUES (%s,%s,%s);"
@@ -84,20 +79,19 @@ def init_app():
 		DatabaseConnection.execute_query(query, params)
 		return {"msg": "Cliente creado con exito"}, 201
 	
-	#1.4 modificar un cliente	
+	#1.4 Modificar un cliente	
 	#EJEMPLO (first_name=Fulano) http://127.0.0.1:5000/customers/modificar/100?campo=first_name&valor=Fulano
 	@app.route('/customers/modificar/<int:customer_id>', methods = ['GET','PUT'])
 	def update_customer(customer_id):
 		campo=request.args.get('campo')
 		valor=request.args.get('valor')
 		query= f"UPDATE sales.customers SET customers.{campo} = '{valor}' WHERE customer_id= {customer_id};"
-		params = customer_id,
 		DatabaseConnection.execute_query("use sales;")
 		DatabaseConnection.execute_query(query)
 		return {"msg": "Datos del cliente  actualizados con exito"}, 200
 	
 
-	#1.5 eliminar un cliente
+	#1.5 Eliminar un cliente
 	@app.route('/customers/eliminar/<int:customer_id>', methods = ['DELETE','GET'])
 	def delete_customer(customer_id):
 		query= "DELETE FROM sales.customers WHERE customer_id = %s;"
@@ -185,4 +179,40 @@ def init_app():
 	
 		return {'msg':"No se encontró el producto"}, 404
 
+
+	#2.3 Registrar un producto
+	#EJEMPLO http://127.0.0.1:5000/products/registrar?product_name=huevos_fritos&brand_id=4&category_id=2&model_year=2019&list_price=894.37
+	@app.route('/products/registrar', methods = ['GET','POST'])
+	def create_product():	
+		query= "INSERT INTO production.products (product_name, brand_id, category_id, model_year, list_price) VALUES (%s,%s,%s,%s,%s);"
+		params = request.args.get('product_name', ''), request.args.get('brand_id', ''), request.args.get('category_id', ''), request.args.get('model_year', ''), request.args.get('list_price', '')
+		DatabaseConnection.fetch_one("use production;")
+		DatabaseConnection.execute_query(query, params)
+		DatabaseConnection.close_connection()
+		return {"msg": "Producto creado con exito"}, 201
+	
+	
+	#2.4 Modificar un cliente	
+	#EJEMPLO (product_name=Pizza) http://127.0.0.1:5000/products/modificar/318?campo=product_name&valor=Pizza
+	@app.route('/products/modificar/<int:product_id>', methods = ['GET','PUT'])
+	def update_product(product_id):
+		campo=request.args.get('campo')
+		valor=request.args.get('valor')
+		query= f"UPDATE production.products SET products.{campo} = '{valor}' WHERE product_id= {product_id};"
+		DatabaseConnection.execute_query("use production;")
+		DatabaseConnection.execute_query(query)
+		DatabaseConnection.close_connection()
+		return {"msg": "Datos del producto  actualizados con exito"}, 200
+	
+	
+	#2.5 Eliminar un producto
+	#EJEMPLO http://127.0.0.1:5000/products/eliminar/320
+	@app.route('/products/eliminar/<int:product_id>', methods = ['DELETE','GET'])
+	def delete_product(product_id):
+		query= "DELETE FROM production.products WHERE product_id = %s;"
+		params = product_id,
+		DatabaseConnection.execute_query(query, params)
+		DatabaseConnection.close_connection()
+		return {"msg": "Producto eliminado con éxito"}, 204
+	
 	return app
